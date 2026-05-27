@@ -26,6 +26,7 @@ const ShowList = ({ addToFavorites }) => {
   const [sortDirection, setSortDirection] = useState('asc'); // State for sorting direction
   const [filterText, setFilterText] = useState(''); // State for filtering text
   const [descriptions, setDescriptions] = useState({}); // State to hold show descriptions
+  const [expandedShows, setExpandedShows] = useState({}); // State to manage expanded show descriptions
 
   useEffect(() => {
     // Effect to fetch shows and descriptions from API on component mount
@@ -36,7 +37,7 @@ const ShowList = ({ addToFavorites }) => {
         setLoading(false); // Set loading to false after data is fetched
 
         // Fetch descriptions for each show
-        const descriptionsResponse = await axios.get(`${API_BASE_URL}/descriptions`);
+        const descriptionsResponse = await axios.get(`${API_BASE_URL}/description`);
         const descriptionsMap = descriptionsResponse.data.reduce((acc, cur) => {
           acc[cur.id] = cur.description;
           return acc;
@@ -60,6 +61,13 @@ const ShowList = ({ addToFavorites }) => {
       setSortDirection('asc'); // Reset sort direction to ascending
     }
   };
+
+  const toggleDescription = (id) => {
+  setExpandedShows((prev) => ({
+    ...prev,
+    [id]: !prev[id],
+  }));
+};
 
   const handleFilterChange = (e) => {
     setFilterText(e.target.value); // Update filter text state on input change
@@ -165,19 +173,25 @@ const ShowList = ({ addToFavorites }) => {
               <div className="ShowDetails">
                 <h3>{show.title}</h3>
                 <p>Seasons: {show.seasons}</p>
-                <p>
-  Genres:{" "}
-  {show.genres
-    ?.map((id) => GENRE_IDS[id])
-    .join(", ")}
-</p>
+                <p>Genres:
+                  {" "}{show.genres?.map((id) => GENRE_IDS[id]).join(", ")}
+                </p>
                 <p>
                   Last Updated:{' '}
                   {show.updated
                     ? new Date(show.updated).toLocaleDateString()
                     : 'N/A'}
                 </p>
-                <p>Description: {descriptions[show.id]}</p>
+                <p>
+  Description:{" "}
+  {expandedShows[show.id]
+    ? show.description
+    : `${show.description.slice(0, 120)}...`}
+</p>
+
+<button onClick={() => toggleDescription(show.id)}>
+  {expandedShows[show.id] ? "Show Less" : "Show More"}
+</button>
               </div>
             </Link>
           ))}
