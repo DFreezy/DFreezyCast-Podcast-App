@@ -165,7 +165,12 @@ const ShowList = ({ addToFavorites }) => {
               <div className="ShowDetails">
                 <h3>{show.title}</h3>
                 <p>Seasons: {show.seasons}</p>
-                <p>Genre: {GENRE_IDS[show.genre]}</p>
+                <p>
+  Genres:{" "}
+  {show.genres
+    ?.map((id) => GENRE_IDS[id])
+    .join(", ")}
+</p>
                 <p>
                   Last Updated:{' '}
                   {show.updated
